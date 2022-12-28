@@ -4,7 +4,7 @@
 
 <h2>Abstract</h2>
 
-The objective of this project is to build an algorithm that accurately predicts the selling price of houses. The work is based on a sample of houses sold in Ames, Iowa. Firstly, pre-processing steps are carried out on the original dataset to ensure data quality and technical feasibility. Secondly, having designed, tested, and optimized four predictive models, namely OLS Regression, Lasso Regression, Regression Tree, and Random Forest, we demonstrate the Random Forest algorithm to be the most accurate algorithm.<br/ >
+The objective of this project is to build an algorithm that accurately predicts the selling price of houses. The work is based on a sample of houses sold in Ames, Iowa. Firstly, pre-processing steps are carried out on the original dataset to ensure data quality and technical feasibility. Secondly, having designed, tested, and optimized four predictive models, namely OLS Regression, Lasso Regression, Regression Tree, and Random Forest, we demonstrate the Random Forest algorithm to be the most accurate algorithm. <br />
 
 💡 This project was carried out for my Machine Learning class with N. Karst at Babson College<br/>
 
