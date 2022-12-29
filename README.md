@@ -4,7 +4,7 @@
 
 <h2>Abstract</h2>
 
-The objective of this project is to build an algorithm that accurately predicts the selling price of houses. The work is based on a sample of houses sold in Ames, Iowa. Firstly, pre-processing steps are carried out on the original dataset to ensure data quality and technical feasibility. Secondly, having designed, tested, and optimized four predictive models, namely OLS Regression, Lasso Regression, Regression Tree, and Random Forest, we demonstrate the Random Forest algorithm to be the most accurate algorithm. <br />
+The objective of this project is to build an algorithm that accurately predicts the selling price of houses. The work is based on a sample of houses sold in Ames, Iowa, and it is divided into four sequential steps. Firstly, pre-processing steps are carried out on the original dataset to ensure data quality and technical feasibility. Secondly, having designed, tested, and optimized four predictive models, namely OLS Regression, Lasso Regression, Regression Tree, and Random Forest, we demonstrate the Random Forest algorithm to be the most accurate algorithm. Thirdly, we include the predictions of the Lasso Regression and Random Forest in the training set following the stacking methodology; stacking successfully improved the predictive accuracy of all the models but the Random Forest reconfirms its relatively superior performance. Lastly, each of the four stacked models is validated and tested on two subsets of the original test dataset with the aim to gain an understanding of the variance of these models. Random Forest ultimately proves to be not only the algorithm with the greatest accuracy, but also the one with the lowest variance as it shows its ability to maintain a satisfactory predictive performance regardless of the test dataset in use. <br />
 
 💡 This project was carried out for my Machine Learning class with N. Karst at Babson College<br/>
 
@@ -241,11 +241,14 @@ Random Forest Visualization: Predictors Importance <br/>
 
 <img src="https://i.imgur.com/VMFQI4F.png" height="80%" width="80%" alt="Regression Tree"/> <br/>
 
+**Findings:**<br/>
+It can be pointed out that the Random Forest and the OLS Regression are respectively more accurate than the Regression Tree and the Lasso Regression. Random Forest is also the most accurate model of all, although there is only a small performance difference between this model and the OLS Regression. 
+The reader must once again be reminded that in machine learning applications there is a tradeoff between accuracy (low bias) and flexibility (low variance), meaning that the more accurate and complex models are, the more likely to generate estimation errors when they are fed with new and unseen data. Therefore, it is important to stress the fact that in this context models are compared in terms of accuracy only.
+
 <br />
 
-<h3> Ensembling & Validation </h3>
+<h3> Ensembling: Stacking </h3>
 
-**Step 7. Stacking** <br/>
 
 ```r
 #Preparing the stack
@@ -275,7 +278,7 @@ errors_stacked_ols = obs_stacked-pred_stacked_ols
 MAPE_stacked_ols = mean(abs(errors_stacked_ols/obs_stacked))
 RMSE_stacked_ols = sqrt(mean(errors_stacked_ols^2))
 
-# A) Manager Model: LASSO
+# B) Manager Model: LASSO
 
 y_stacked = train_stacked$SalePrice
 
@@ -350,9 +353,10 @@ RMSE_stacked_forest = sqrt(mean(errors_stacked_forest^2))
 varImpPlot(stacked_forest)
 ```
 
-**Conclusion**
-It can be pointed out that the Random Forest and the OLS Regression are respectively more accurate than the Regression Tree and the Lasso Regression. Random Forest is also the most accurate model of all, although there is only a small performance difference between this model and the OLS Regression. 
-The reader must once again be reminded that in machine learning applications there is a tradeo� between accuracy (low bias) and flexibility (low variance), meaning that the more accurate and complex models are, the more likely to generate estimation errors when they are fed with new and unseen data. Therefore, it is important to stress the fact that in this context models are compared in terms of accuracy only.
+**Findings:** <br/>
+<img src="https://i.imgur.com/wory2dm.png" height="80%" width="80%" alt="Stacking"/> <br/>
+
+It is evident that the stacking methodology has been a success: the stacked version of each model generates both a lower RMSE and a lower MAPE, highlighting an overall improvement in predictive performance. It is also clear that the stacked methodology produced a di erent impact on performance depending on the model. The Regression Tree is the model that benefitted the most from the stacking procedure, considering that the RMSE experienced a 35% drop from $40,000 to $25,000 approximately, and the MAPE decreased from 16.9% (the highest amid the original models) to 10.4% (the second lowest amid the meta-models). The Lasso Regression follows with an improvement on the RMSE and on the MAPE of about -$7,200 and -2.1%, whereas the OLS Regression experiences a more subtle change in performance with roughly -$2,800 and -0.4% respectively. The performance improvement of the Random Forest is similar to that of the OLS Regression, with a RMSE and MAPE reduction of about -$2,700 and -0.8% respectively. It is important to point out that the original version of the latter two models, namely the original OLS Regression and the Random Forest, account for the greatest accuracy, and thus one could argue that the stacking expectedly had a smaller e ect as there is less room for performance improvement.
 
 
 </p>
