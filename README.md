@@ -37,6 +37,10 @@ The objective of this project is to build an algorithm that accurately predicts 
 #Load Data
 df_train = read.csv(YOUR PATH TO BostonHousing.csv, stringsAsFactors = T)
 
+#Assessment of NULL values on original df
+sum(is.na(df_raw))
+colSums(is.na(df_raw))
+
 #Remove Factor Variables with less than 2 levels (otherwise, OLS error)
 names(df_train) = make.names(names(df_train))
 
@@ -235,9 +239,116 @@ Random Forest Visualization: Predictors Importance <br/>
 
 <br />
 
-<h3> Meta-Analysis: Models Comparison </h3>
-
 <img src="https://i.imgur.com/VMFQI4F.png" height="80%" width="80%" alt="Regression Tree"/> <br/>
+
+<br />
+
+<h3> Ensembling & Validation </h3>
+
+**Step 7. Stacking** <br/>
+
+```r
+#Preparing the stack
+xi_df = data.matrix(df_train[,c(vars_selected)])
+pred_lasso_df = predict(lasso_model, s= lambda_best, xi_df) #lasso predictions column (only lasso because it's better than ols)
+
+pred_forest_df = predict(forest, df_train) #random forest predictions column (only forest because it's better than tree)
+
+df_train_stacked = cbind(df_train, pred_lasso_df, pred_forest_df) #stacked dataframe
+
+train_stacked = df_train_stacked[train_cases,]
+test_stacked = df_train_stacked[-train_cases,]
+
+
+# A) Manager Model: OLS
+stacked_ols = lm(SalePrice~.,train_stacked)
+stacked_step_ols = step(stacked_ols)
+
+summary(stacked_step_ols)
+
+pred_stacked_ols = predict(stacked_step_ols, test_stacked)
+
+obs_stacked = test_stacked$SalePrice
+
+errors_stacked_ols = obs_stacked-pred_stacked_ols
+
+MAPE_stacked_ols = mean(abs(errors_stacked_ols/obs_stacked))
+RMSE_stacked_ols = sqrt(mean(errors_stacked_ols^2))
+
+# A) Manager Model: LASSO
+
+y_stacked = train_stacked$SalePrice
+
+vars_selected = select.list(names(train_stacked), multiple=TRUE, title = 'select your variable names', graphics = TRUE)
+
+xi_train_stacked = data.matrix(train_stacked[,c(vars_selected)])
+
+lasso_preliminary_stacked = cv.glmnet(xi_train_stacked, y_stacked, alpha = 1)
+
+lambda_best_stacked = lasso_preliminary_stacked$lambda.min
+lambda_best_stacked
+
+plot(lasso_preliminary_stacked)
+
+stacked_lasso_model = glmnet(xi_train_stacked, y_stacked, alpha=1, lambda = lambda_best_stacked)
+
+coef(stacked_lasso_model)
+
+xi_test_stacked = data.matrix(test_stacked[,c(vars_selected)])
+
+pred_stacked_lasso = predict(stacked_lasso_model, s= lambda_best_stacked, xi_test_stacked)
+
+sst_stacked = sum((obs_stacked - mean(obs_stacked))^2)
+sse_stacked = sum((pred_stacked_lasso - obs_stacked)^2)
+
+R2_stacked_lasso = 1- (sse_stacked/sst_stacked)
+
+R2_adj_stacked_lasso = 1 - ((1-R2_stacked_lasso)*((nrow(train_stacked)-1))/((nrow(train_stacked))-72-1))
+
+errors_stacked_lasso = obs_stacked-pred_stacked_lasso
+
+MAPE_stacked_lasso = mean(abs(errors_stacked_lasso/obs_stacked))
+RMSE_stacked_lasso = sqrt(mean(errors_stacked_lasso^2))
+
+# C) Manager Model: REGRESSION TREE
+stacked_tree = rpart(SalePrice~.,train_stacked)
+rpart.plot(stacked_tree)
+
+pred_tree_stacked = predict(stacked_tree,test_stacked)
+
+
+errors_stacked_tree = obs_stacked-pred_tree_stacked
+
+MAPE_stacked_tree = mean(abs(errors_stacked_tree/obs_stacked))
+RMSE_stacked_tree = sqrt(mean(errors_stacked_tree^2))
+
+
+stacked_tree_big = rpart(SalePrice~.,data=train_stacked, control=stopping)
+stacked_tree_pruned = easyPrune(stacked_tree_big)
+
+rpart.plot(stacked_tree_pruned)
+
+pred_stacked_tree_pruned = predict(stacked_tree_pruned,test_stacked)
+
+errors_stacked_tree_pruned = obs_stacked - pred_stacked_tree_pruned
+
+MAPE_stacked_tree_pruned = mean(abs(errors_stacked_tree_pruned/obs_stacked))
+RMSE_stacked_tree_pruned = sqrt(mean(errors_stacked_tree_pruned^2))
+
+# D) Manager Model: RANDOM FOREST
+stacked_forest = randomForest(SalePrice~., data=train_stacked,ntree = 500)
+
+pred_stacked_forest = predict(stacked_forest,test_stacked)
+
+error_rate_stacked_forest = sum(pred_stacked_forest != obs_stacked)/nrow(test_stacked)
+
+errors_stacked_forest = obs_stacked - pred_stacked_forest
+
+MAPE_stacked_forest = mean(abs(errors_stacked_forest/obs_stacked))
+RMSE_stacked_forest = sqrt(mean(errors_stacked_forest^2))
+
+varImpPlot(stacked_forest)
+```
 
 **Conclusion**
 It can be pointed out that the Random Forest and the OLS Regression are respectively more accurate than the Regression Tree and the Lasso Regression. Random Forest is also the most accurate model of all, although there is only a small performance difference between this model and the OLS Regression. 
