@@ -243,7 +243,13 @@ Random Forest Visualization: Predictors Importance <br/>
 
 <br />
 
-<h3> Ensembling & Validation </h3>
+**Findings:**
+It can be pointed out that the Random Forest and the OLS Regression are respectively more accurate than the Regression Tree and the Lasso Regression. Random Forest is also the most accurate model of all, although there is only a small performance difference between this model and the OLS Regression. 
+The reader must once again be reminded that in machine learning applications there is a tradeoff between accuracy (low bias) and flexibility (low variance), meaning that the more accurate and complex models are, the more likely to generate estimation errors when they are fed with new and unseen data. Therefore, it is important to stress the fact that in this context models are compared in terms of accuracy only.
+
+<br />
+
+<h3> Ensembling </h3>
 
 **Step 7. Stacking** <br/>
 
@@ -349,10 +355,14 @@ RMSE_stacked_forest = sqrt(mean(errors_stacked_forest^2))
 
 varImpPlot(stacked_forest)
 ```
+<br />
 
-**Conclusion**
-It can be pointed out that the Random Forest and the OLS Regression are respectively more accurate than the Regression Tree and the Lasso Regression. Random Forest is also the most accurate model of all, although there is only a small performance difference between this model and the OLS Regression. 
-The reader must once again be reminded that in machine learning applications there is a tradeo� between accuracy (low bias) and flexibility (low variance), meaning that the more accurate and complex models are, the more likely to generate estimation errors when they are fed with new and unseen data. Therefore, it is important to stress the fact that in this context models are compared in terms of accuracy only.
+<img src="https://i.imgur.com/wory2dm.png" height="80%" width="80%" alt="Regression Tree"/> <br/>
+
+<br />
+
+**Findings:**
+It is evident that the stacking methodology has been a success: the stacked version of each model generates both a lower RMSE and a lower MAPE, highlighting an overall improvement in predictive performance. It is also clear that the stacked methodology produced a different impact on performance depending on the model. The Regression Tree is the model that benefitted the most from the stacking procedure, considering that the RMSE experienced a 35% drop from $40,000 to $25,000 approximately, and the MAPE decreased from 16.9% (the highest amid the original models) to 10.4% (the second lowest amid the meta-models). The Lasso Regression follows with an improvement on the RMSE and on the MAPE of about -$7,200 and -2.1%, whereas the OLS Regression experiences a more subtle change in performance with roughly -$2,800 and -0.4% respectively. The performance improvement of the Random Forest is similar to that of the OLS Regression, with a RMSE and MAPE reduction of about -$2,700 and -0.8% respectively. It is important to point out that the original version of the latter two models, namely the original OLS Regression and the Random Forest, account for the greatest accuracy, and thus one could argue that the stacking expectedly had a smaller effect as there is less room for performance improvement.
 
 
 </p>
